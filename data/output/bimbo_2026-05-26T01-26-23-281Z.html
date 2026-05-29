@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Informe Grupo Bimbo Uruguay</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #1a1a1a; font-size: 10.5px; margin: 0; line-height: 1.5; }
+  .cover { page-break-after: always; min-height: 95vh; display: flex; flex-direction: column; justify-content: space-between; padding: 30px 10px; }
+  .cover-top { border-left: 6px solid #E1251B; padding-left: 22px; }
+  .cover-eyebrow { font-size: 11px; color: #002E6D; text-transform: uppercase; letter-spacing: .15em; font-weight: 700; margin-bottom: 8px; }
+  h1 { font-size: 38px; margin: 0 0 8px; line-height: 1.15; font-weight: 800; }
+  h2 { font-size: 14px; margin: 0 0 12px; padding: 7px 14px; background: #002E6D; color: #fff; border-radius: 4px; display: inline-block; }
+  h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: #002E6D; margin: 0 0 8px; }
+  .cover h2 { font-size: 18px; margin: 12px 0 0; color: #555; background: none; padding: 0; font-weight: 500; display: block; }
+  .cover-meta { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; line-height: 1.9; }
+  .cover-bottom { text-align: center; color: #999; font-size: 10px; }
+  .page-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #E1251B; padding-bottom: 8px; margin-bottom: 18px; }
+  .page-header .title { font-size: 14px; font-weight: 800; color: #E1251B; }
+  .page-header .meta { font-size: 10px; color: #888; }
+  section { page-break-inside: avoid; margin-bottom: 22px; }
+  .lead { font-size: 12px; line-height: 1.7; padding: 14px 18px; background: #fff8e7; border-left: 4px solid #E1251B; border-radius: 4px; margin-bottom: 18px; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 22px; }
+  .kpi { padding: 12px 14px; border: 1px solid #e8dfc8; border-radius: 8px; border-left: 4px solid #E1251B; }
+  .kpi-label { font-size: 9px; color: #666; text-transform: uppercase; letter-spacing: .07em; font-weight: 700; }
+  .kpi-value { font-size: 20px; font-weight: 800; margin-top: 3px; }
+  .kpi-sub { font-size: 9px; color: #888; }
+  table { width: 100%; border-collapse: collapse; font-size: 10px; }
+  th { background: #fff8e7; padding: 7px 8px; text-align: left; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #002E6D; border-bottom: 2px solid #e8dfc8; }
+  td { padding: 6px 8px; border-bottom: 1px solid #f0e8d0; vertical-align: top; }
+  td.price, th.price { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+  td.brand { color: #666; text-transform: capitalize; }
+  .pill { display: inline-block; padding: 1.5px 7px; border-radius: 8px; color: #fff; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+  .pill.tata { background: #e5002b; }
+  .pill.disco { background: #0070d2; }
+  .pill.devoto { background: #f15c22; }
+  .pill.tiendainglesa { background: #19744a; }
+  footer { margin-top: 24px; padding-top: 10px; border-top: 1px solid #ddd; text-align: center; color: #999; font-size: 8.5px; }
+</style>
+</head>
+<body>
+<div class="cover">
+  <div>
+    <div class="cover-top">
+      <div class="cover-eyebrow">Informe Ejecutivo</div>
+      <h1>Precios Grupo Bimbo<br>Uruguay</h1>
+      <h2>Relevamiento en supermercados online</h2>
+    </div>
+    <div class="cover-meta">
+      <b>Fecha:</b> 26 de mayo de 2026 a las 1:26 a. m.<br>
+      <b>Supermercados:</b> Tata · Disco · Devoto · Tienda Inglesa<br>
+      <b>SKUs analizados:</b> 222<br>
+      <b>Submarcas configuradas:</b> 10
+    </div>
+  </div>
+  <div class="cover-bottom">Generado automaticamente con datos relevados de los sitios oficiales.</div>
+</div>
+
+<div class="page-header">
+  <div class="title">Resumen Ejecutivo</div>
+  <div class="meta">26 de mayo de 2026 a las 1:26 a. m.</div>
+</div>
+
+<section>
+  <p class="lead">Se relevaron 222 productos del Grupo Bimbo en 4/4 supermercados. Se detectaron 10 submarcas con precio promedio $ 145.</p>
+  <div class="kpis">
+    <div class="kpi"><div class="kpi-label">SKUs</div><div class="kpi-value">222</div><div class="kpi-sub">Grupo Bimbo</div></div>
+    <div class="kpi"><div class="kpi-label">Submarcas</div><div class="kpi-value">10</div><div class="kpi-sub">detectadas</div></div>
+    <div class="kpi"><div class="kpi-label">Promedio</div><div class="kpi-value">$ 145</div><div class="kpi-sub">precio actual</div></div>
+    <div class="kpi"><div class="kpi-label">Ofertas</div><div class="kpi-value">18</div><div class="kpi-sub">8% del catalogo</div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Cobertura por submarca</h2>
+  <table>
+    <thead><tr><th>Submarca</th><th class="price">SKUs</th><th class="price">Supers</th><th class="price">Precio prom.</th><th class="price">Ofertas</th></tr></thead>
+    <tbody><tr><td><b>Bimbo</b></td><td class="price">53</td><td class="price">4/4</td><td class="price">$ 156</td><td class="price">4</td></tr><tr><td><b>Maestro Cubano</b></td><td class="price">49</td><td class="price">4/4</td><td class="price">$ 129</td><td class="price">0</td></tr><tr><td><b>Los Sorchantes</b></td><td class="price">30</td><td class="price">4/4</td><td class="price">$ 149</td><td class="price">2</td></tr><tr><td><b>Nutrabien</b></td><td class="price">24</td><td class="price">4/4</td><td class="price">$ 88</td><td class="price">3</td></tr><tr><td><b>Artesano</b></td><td class="price">18</td><td class="price">4/4</td><td class="price">$ 154</td><td class="price">0</td></tr><tr><td><b>Rapiditas</b></td><td class="price">15</td><td class="price">4/4</td><td class="price">$ 159</td><td class="price">7</td></tr><tr><td><b>Sanissimo</b></td><td class="price">11</td><td class="price">4/4</td><td class="price">$ 205</td><td class="price">2</td></tr><tr><td><b>Tia Rosa</b></td><td class="price">11</td><td class="price">4/4</td><td class="price">$ 164</td><td class="price">0</td></tr><tr><td><b>Vital</b></td><td class="price">7</td><td class="price">4/4</td><td class="price">$ 222</td><td class="price">0</td></tr><tr><td><b>Pancatalan</b></td><td class="price">4</td><td class="price">3/4</td><td class="price">$ 90</td><td class="price">0</td></tr></tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Cobertura por supermercado</h2>
+  <table>
+    <thead><tr><th>Super</th><th class="price">SKUs</th><th class="price">Prom.</th><th class="price">Rango</th><th class="price">Ofertas</th></tr></thead>
+    <tbody><tr><td><span class="pill tata">Tata</span></td><td class="price">56</td><td class="price">$ 143</td><td class="price">$ 40 - $ 261</td><td class="price">7</td></tr><tr><td><span class="pill disco">Disco</span></td><td class="price">56</td><td class="price">$ 146</td><td class="price">$ 42 - $ 279</td><td class="price">3</td></tr><tr><td><span class="pill devoto">Devoto</span></td><td class="price">55</td><td class="price">$ 145</td><td class="price">$ 42 - $ 279</td><td class="price">3</td></tr><tr><td><span class="pill tiendainglesa">Tienda Inglesa</span></td><td class="price">55</td><td class="price">$ 148</td><td class="price">$ 30 - $ 338</td><td class="price">5</td></tr></tbody>
+  </table>
+</section>
+
+<section style="page-break-before:always">
+  <div class="page-header"><div class="title">Oportunidades</div><div class="meta">26 de mayo de 2026 a las 1:26 a. m.</div></div>
+  <h2>Diferencias entre supermercados</h2>
+  <table>
+    <thead><tr><th>Producto</th><th>Submarca</th><th class="price">Mas barato</th><th class="price">Mas caro</th><th class="price">Diferencia</th></tr></thead>
+    <tbody><tr><td>Galletas Nutrabien Avena Y Chocolate 175 G</td><td class="brand">nutrabien</td><td class="price"><span class="pill tiendainglesa">Tienda Inglesa</span> $ 82</td><td class="price"><span class="pill devoto">Devoto</span> $ 131</td><td class="price" style="color:#E1251B">$ 49 · 37.4%</td></tr><tr><td>Pan Integral LOS SORCHANTES 550 gr</td><td class="brand">los sorchantes</td><td class="price"><span class="pill tata">Tata</span> $ 125</td><td class="price"><span class="pill tiendainglesa">Tienda Inglesa</span> $ 171</td><td class="price" style="color:#E1251B">$ 46 · 26.9%</td></tr><tr><td>Habanitos EL MAESTRO CUBANO al Agua 180g</td><td class="brand">maestro cubano</td><td class="price"><span class="pill tata">Tata</span> $ 113</td><td class="price"><span class="pill tiendainglesa">Tienda Inglesa</span> $ 150</td><td class="price" style="color:#E1251B">$ 37 · 24.7%</td></tr><tr><td>Vainillas Bimbo 74 G</td><td class="brand">bimbo</td><td class="price"><span class="pill tata">Tata</span> $ 63</td><td class="price"><span class="pill tiendainglesa">Tienda Inglesa</span> $ 78</td><td class="price" style="color:#E1251B">$ 15 · 19.2%</td></tr><tr><td>Rapiditas Light Bimbo 10 U</td><td class="brand">rapiditas</td><td class="price"><span class="pill tata">Tata</span> $ 145</td><td class="price"><span class="pill tiendainglesa">Tienda Inglesa</span> $ 179</td><td class="price" style="color:#E1251B">$ 34 · 19.0%</td></tr><tr><td>Pan Integral Con Miel Bimbo 660 G</td><td class="brand">bimbo</td><td class="price"><span class="pill tata">Tata</span> $ 159</td><td class="price"><span class="pill tiendainglesa">Tienda Inglesa</span> $ 193</td><td class="price" style="color:#E1251B">$ 34 · 17.6%</td></tr><tr><td>Grisines Finitos El Maestro Cubano 100 G</td><td class="brand">maestro cubano</td><td class="price"><span class="pill tata">Tata</span> $ 99</td><td class="price"><span class="pill tiendainglesa">Tienda Inglesa</span> $ 120</td><td class="price" style="color:#E1251B">$ 21 · 17.5%</td></tr><tr><td>Grisines Finitos con Salvado El Maestro Cubano 100 G</td><td class="brand">maestro cubano</td><td class="price"><span class="pill tata">Tata</span> $ 99</td><td class="price"><span class="pill tiendainglesa">Tienda Inglesa</span> $ 120</td><td class="price" style="color:#E1251B">$ 21 · 17.5%</td></tr></tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Top descuentos detectados</h2>
+  <table>
+    <thead><tr><th>Producto</th><th>Submarca</th><th>Super</th><th class="price">Lista</th><th class="price">Oferta</th><th class="price">Ahorra</th><th class="price">%</th></tr></thead>
+    <tbody><tr><td>Tostadita Salmas de Maíz al Horno SANISSIMO 6 Unidades</td><td class="brand">sanissimo</td><td><span class="pill tiendainglesa">Tienda Inglesa</span></td><td class="price">$ 182</td><td class="price">$ 109</td><td class="price">$ 73</td><td class="price">40%</td></tr><tr><td>Tostadita Salmas de Maíz al Horno SANISSIMO 216 gr</td><td class="brand">sanissimo</td><td><span class="pill tiendainglesa">Tienda Inglesa</span></td><td class="price">$ 310</td><td class="price">$ 186</td><td class="price">$ 124</td><td class="price">40%</td></tr><tr><td>Galleta NUTRA BIEN Avena y Manzana 175 gr</td><td class="brand">nutrabien</td><td><span class="pill tiendainglesa">Tienda Inglesa</span></td><td class="price">$ 136</td><td class="price">$ 82</td><td class="price">$ 54</td><td class="price">40%</td></tr><tr><td>Galleta NUTRA BIEN Avena y Pasas 175 gr</td><td class="brand">nutrabien</td><td><span class="pill tiendainglesa">Tienda Inglesa</span></td><td class="price">$ 136</td><td class="price">$ 82</td><td class="price">$ 54</td><td class="price">40%</td></tr><tr><td>Galletas NUTRA BIEN con Avena y Chocolate 175 gr</td><td class="brand">nutrabien</td><td><span class="pill tiendainglesa">Tienda Inglesa</span></td><td class="price">$ 136</td><td class="price">$ 82</td><td class="price">$ 54</td><td class="price">40%</td></tr><tr><td>Pan Integral Los Sorchantes Familiar 570 G</td><td class="brand">los sorchantes</td><td><span class="pill tata">Tata</span></td><td class="price">$ 169</td><td class="price">$ 125</td><td class="price">$ 44</td><td class="price">26%</td></tr><tr><td>Tortillas rapiditas BIMBO 310 g</td><td class="brand">rapiditas</td><td><span class="pill devoto">Devoto</span></td><td class="price">$ 168</td><td class="price">$ 139</td><td class="price">$ 29</td><td class="price">17%</td></tr><tr><td>Tortillas rapiditas BIMBO 310 g</td><td class="brand">rapiditas</td><td><span class="pill disco">Disco</span></td><td class="price">$ 168</td><td class="price">$ 139</td><td class="price">$ 29</td><td class="price">17%</td></tr><tr><td>Tortillas rapiditas BIMBO light 310 g</td><td class="brand">rapiditas</td><td><span class="pill devoto">Devoto</span></td><td class="price">$ 168</td><td class="price">$ 139</td><td class="price">$ 29</td><td class="price">17%</td></tr><tr><td>Tortillas rapiditas BIMBO light 310 g</td><td class="brand">rapiditas</td><td><span class="pill disco">Disco</span></td><td class="price">$ 168</td><td class="price">$ 139</td><td class="price">$ 29</td><td class="price">17%</td></tr></tbody>
+  </table>
+</section>
+
+<footer>Informe generado automaticamente · Datos relevados de Tata, Disco, Devoto y Tienda Inglesa · Uso interno.</footer>
+</body>
+</html>
