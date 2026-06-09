@@ -374,6 +374,7 @@ function renderAll() {
   renderPrices();
   renderPositioning();
   renderExecutive();
+  renderSend();
   updateTabBadges();
 }
 
@@ -1034,7 +1035,7 @@ async function refresh() {
     toast('Scrape disparado. Esperando resultados (~3-5 min)…');
     btn.innerHTML = '<span class="spinner"></span> Scraping…';
     await pollUntilDone(initial);
-    toast('Listo. Datos actualizados.', 'success');
+    toast('Actualizado correctamente.', 'success');
     await load();
   } catch (err) {
     toast('Error: ' + err.message, 'error');
@@ -1091,6 +1092,370 @@ function initEvents() {
   $('#modal').addEventListener('click', (e) => { if (e.target.id === 'modal') closeModal(); });
   $('#modalClose').addEventListener('click', closeModal);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+}
+
+// ===== Tab Enviar Informe =====
+const SEND_EMAILS = [
+  'wilbert.molina@grupobimbo.com',
+  'juan.casuriaga@grupobimbo.com',
+];
+
+function renderSend() {
+  const el = $('#sendContent');
+  if (!el) return;
+  const d = state.generatedAt ? new Date(state.generatedAt) : null;
+  const dateStr = d
+    ? d.toLocaleDateString('es-UY', { day: '2-digit', month: 'long', year: 'numeric' })
+    : '—';
+  const timeStr = d ? d.toLocaleTimeString('es-UY', { hour: '2-digit', minute: '2-digit' }) : '—';
+  const items = state.items || [];
+  const offers = items.filter((i) => i.listPrice && i.price && i.price < i.listPrice);
+
+  el.innerHTML = `
+    <div class="panel">
+      <h2 class="panel-title">Enviar Informe por Email</h2>
+
+      <div class="send-info-row">
+        <div class="send-kpi">
+          <span class="send-kpi-label">Última actualización</span>
+          <span class="send-kpi-value">${dateStr}</span>
+          <span class="send-kpi-sub">${timeStr}</span>
+        </div>
+        <div class="send-kpi">
+          <span class="send-kpi-label">Productos relevados</span>
+          <span class="send-kpi-value">${items.length}</span>
+          <span class="send-kpi-sub">${[...new Set(items.map((i) => i.super))].length} cadenas</span>
+        </div>
+        <div class="send-kpi">
+          <span class="send-kpi-label">Ofertas activas</span>
+          <span class="send-kpi-value">${offers.length}</span>
+          <span class="send-kpi-sub">con descuento</span>
+        </div>
+        <div class="send-kpi">
+          <span class="send-kpi-label">Marcas</span>
+          <span class="send-kpi-value">${[...new Set(items.map((i) => i.brand))].length}</span>
+          <span class="send-kpi-sub">en cartera</span>
+        </div>
+      </div>
+
+      <hr class="send-divider" />
+
+      <div class="send-recipients">
+        <div class="send-section-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          Destinatarios
+        </div>
+        <div class="send-email-list">
+          ${SEND_EMAILS.map((e) => `<span class="send-email-tag">${escape(e)}</span>`).join('')}
+        </div>
+      </div>
+
+      <hr class="send-divider" />
+
+      <div class="send-actions">
+        <button class="btn primary" id="sendPdfBtn" ${!items.length ? 'disabled' : ''}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+          Generar PDF y enviar
+        </button>
+        <a class="btn" href="/data/latest.csv" download="informe-bimbo-${d ? d.toISOString().slice(0,10) : 'latest'}.csv">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Descargar CSV
+        </a>
+        <a class="btn" href="/report.html" target="_blank">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          Abrir informe completo
+        </a>
+      </div>
+
+      <div id="sendStatus" class="send-status" style="display:none"></div>
+    </div>
+  `;
+
+  $('#sendPdfBtn')?.addEventListener('click', handleSendReport);
+}
+
+async function handleSendReport() {
+  if (!window.jspdf) {
+    toast('Cargando librerías PDF…', '');
+    await loadPdfLibs();
+  }
+  const btn = $('#sendPdfBtn');
+  btn.disabled = true;
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<span class="spinner"></span> Generando PDF…';
+  showSendStatus('info', 'Generando informe PDF, por favor esperá…');
+
+  try {
+    const pdfBlob = await buildReportPdf();
+    const base64 = await blobToBase64(pdfBlob);
+    const d = state.generatedAt ? new Date(state.generatedAt) : new Date();
+    const dateStr = d.toLocaleDateString('es-UY', { day: '2-digit', month: 'long', year: 'numeric' });
+    const fname = `informe-bimbo-${d.toISOString().slice(0,10)}.pdf`;
+
+    btn.innerHTML = '<span class="spinner"></span> Enviando…';
+    showSendStatus('info', 'Enviando por email…');
+
+    const res = await fetch('/api/send-report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        emails: SEND_EMAILS,
+        subject: `Informe de Precios Bimbo - ${dateStr}`,
+        pdfBase64: base64,
+        filename: fname,
+        summary: buildSummaryText(),
+      }),
+    });
+    const json = await res.json();
+
+    if (res.ok && json.ok) {
+      showSendStatus('ok', `Informe enviado correctamente a ${SEND_EMAILS.length} destinatarios.`);
+      toast('Informe enviado correctamente.', 'success');
+    } else if (json.fallback === 'mailto') {
+      // Download + open mailto
+      triggerDownload(pdfBlob, fname);
+      const subject = encodeURIComponent(`Informe de Precios Bimbo - ${dateStr}`);
+      const body = encodeURIComponent(buildSummaryText());
+      window.location.href = `mailto:${SEND_EMAILS.join(',')}?subject=${subject}&body=${body}`;
+      showSendStatus('info', 'Se abrió Outlook. Adjuntá el PDF descargado y enviá.');
+    } else {
+      throw new Error(json.error || 'Error al enviar');
+    }
+  } catch (e) {
+    showSendStatus('err', 'Error: ' + e.message);
+    toast('Error al enviar: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = orig;
+  }
+}
+
+function showSendStatus(type, msg) {
+  const el = $('#sendStatus');
+  if (!el) return;
+  el.style.display = '';
+  el.className = `send-status send-status-${type}`;
+  el.textContent = msg;
+}
+
+function buildSummaryText() {
+  const items = state.items || [];
+  const offers = items.filter((i) => i.listPrice && i.price && i.price < i.listPrice);
+  const d = state.generatedAt ? new Date(state.generatedAt) : new Date();
+  return `Informe de Precios - Grupo Bimbo Uruguay\nFecha: ${d.toLocaleDateString('es-UY')}\n\nResumen:\n• Productos relevados: ${items.length}\n• Marcas: ${[...new Set(items.map((i) => i.brand))].length}\n• Cadenas: ${[...new Set(items.map((i) => i.super))].length}\n• Ofertas activas: ${offers.length}\n\nVer informe completo adjunto en PDF.`;
+}
+
+function triggerDownload(blob, filename) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result.split(',')[1]);
+    r.onerror = reject;
+    r.readAsDataURL(blob);
+  });
+}
+
+async function loadPdfLibs() {
+  if (window.jspdf) return;
+  await Promise.all([
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'),
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js'),
+  ]);
+}
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+async function buildReportPdf() {
+  if (!window.jspdf) await loadPdfLibs();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+  const W = 210, H = 297, M = 14, CW = W - M * 2;
+  const RED = [227, 24, 55], DARK = [26, 26, 46], GRAY = [100, 100, 100];
+  const STORES = ['tata', 'disco', 'eldorado', 'tiendainglesa'];
+  const SLABELS = { tata: 'Tata', disco: 'Disco', eldorado: 'El Dorado', tiendainglesa: 'T. Inglesa' };
+
+  const items = (state.items || []).filter((i) => i.price != null && i.price > 0);
+  const brands = [...new Set(items.map((i) => i.brand))].filter(Boolean).sort();
+  const offers = items.filter((i) => i.listPrice && i.price < i.listPrice);
+  const withPvp = items.filter((i) => i.suggestedPrice);
+  const above = withPvp.filter((i) => (i.gapPct || 0) > 3);
+  const below = withPvp.filter((i) => (i.gapPct || 0) < -3);
+  const d = state.generatedAt ? new Date(state.generatedAt) : new Date();
+  const dateStr = d.toLocaleDateString('es-UY', { day: '2-digit', month: 'long', year: 'numeric' });
+
+  // Coverage map
+  const cov = {};
+  brands.forEach((b) => {
+    cov[b] = {};
+    STORES.forEach((s) => { cov[b][s] = items.filter((i) => i.brand === b && i.super === s).length; });
+  });
+
+  const cap = (s) => s ? s.split(' ').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : s;
+  const fmtN = (n) => n != null ? `$${n.toLocaleString('es-UY', { maximumFractionDigits: 0 })}` : '—';
+
+  // ── Página 1: Portada + KPIs ──
+  doc.setFillColor(...RED);
+  doc.rect(0, 0, W, 42, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(22); doc.setFont('helvetica', 'bold');
+  doc.text('Informe de Precios', M, 20);
+  doc.setFontSize(12); doc.setFont('helvetica', 'normal');
+  doc.text(`Grupo Bimbo · Uruguay · ${dateStr}`, M, 32);
+
+  let y = 56;
+  doc.setFontSize(13); doc.setFont('helvetica', 'bold'); doc.setTextColor(...DARK);
+  doc.text('Resumen ejecutivo', M, y); y += 8;
+
+  const kpis = [
+    { label: 'Total Productos', value: String(items.length) },
+    { label: 'Marcas', value: String(brands.length) },
+    { label: 'Ofertas activas', value: String(offers.length) },
+    { label: 'Con PVP asignado', value: String(withPvp.length) },
+    { label: 'Sobre PVP', value: String(above.length) },
+    { label: 'Bajo PVP', value: String(below.length) },
+  ];
+  const cw = (CW - 10) / 3;
+  kpis.forEach((k, idx) => {
+    const col = idx % 3, row = Math.floor(idx / 3);
+    const x = M + col * (cw + 5), cy = y + row * 28;
+    doc.setFillColor(249, 249, 249); doc.setDrawColor(220, 220, 220);
+    doc.roundedRect(x, cy, cw, 22, 2, 2, 'FD');
+    doc.setFontSize(18); doc.setFont('helvetica', 'bold'); doc.setTextColor(...RED);
+    doc.text(k.value, x + cw / 2, cy + 12, { align: 'center' });
+    doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.setTextColor(...GRAY);
+    doc.text(k.label, x + cw / 2, cy + 19, { align: 'center' });
+  });
+  y += 64;
+
+  // ── Página 2: Cobertura ──
+  doc.addPage();
+  doc.setFillColor(...RED); doc.rect(0, 0, W, 36, 'F');
+  doc.setTextColor(255, 255, 255); doc.setFontSize(15); doc.setFont('helvetica', 'bold');
+  doc.text('Cobertura por Marca y Cadena', M, 16);
+  doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+  doc.text(`Grupo Bimbo · ${dateStr}`, M, 27);
+
+  doc.autoTable({
+    startY: 44,
+    head: [['Marca', ...STORES.map((s) => SLABELS[s]), 'Total']],
+    body: brands.map((b) => {
+      const counts = STORES.map((s) => cov[b][s]);
+      return [cap(b), ...counts.map((c) => c > 0 ? String(c) : '—'), String(counts.reduce((a, v) => a + v, 0))];
+    }),
+    theme: 'grid',
+    styles: { fontSize: 9, cellPadding: 3 },
+    headStyles: { fillColor: RED, textColor: 255, fontStyle: 'bold' },
+    alternateRowStyles: { fillColor: [249, 249, 249] },
+    columnStyles: { 0: { fontStyle: 'bold' }, 1: { halign: 'center' }, 2: { halign: 'center' }, 3: { halign: 'center' }, 4: { halign: 'center' }, 5: { halign: 'center' } },
+    margin: { left: M, right: M },
+  });
+
+  // ── Página 3: Precios vs PVP ──
+  doc.addPage();
+  doc.setFillColor(...RED); doc.rect(0, 0, W, 36, 'F');
+  doc.setTextColor(255, 255, 255); doc.setFontSize(15); doc.setFont('helvetica', 'bold');
+  doc.text('Precios vs PVP Sugerido', M, 16);
+  doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+  doc.text(`Grupo Bimbo · ${dateStr}`, M, 27);
+
+  doc.autoTable({
+    startY: 44,
+    head: [['Producto', 'Marca', 'Cadena', 'Precio', 'PVP Sug.', 'GAP %', 'Estado']],
+    body: withPvp.sort((a, b) => Math.abs(b.gapPct || 0) - Math.abs(a.gapPct || 0)).slice(0, 100).map((i) => {
+      const gap = i.gapPct != null ? i.gapPct.toFixed(1) + '%' : '—';
+      const status = i.gapPct == null ? '' : i.gapPct > 3 ? 'Sobre PVP' : i.gapPct < -3 ? 'Bajo PVP' : 'En rango';
+      return [i.name.substring(0, 45), cap(i.brand), SLABELS[i.super] || i.super, fmtN(i.price), fmtN(i.suggestedPrice), gap, status];
+    }),
+    theme: 'striped',
+    styles: { fontSize: 8, cellPadding: 2.5, overflow: 'ellipsize' },
+    headStyles: { fillColor: RED, textColor: 255, fontStyle: 'bold', fontSize: 8 },
+    columnStyles: { 0: { cellWidth: 62 }, 2: { cellWidth: 22 }, 3: { halign: 'right', cellWidth: 20 }, 4: { halign: 'right', cellWidth: 20 }, 5: { halign: 'right', cellWidth: 16 }, 6: { cellWidth: 20 } },
+    didParseCell(data) {
+      if (data.column.index === 6 && data.section === 'body') {
+        if (data.cell.raw === 'Sobre PVP') data.cell.styles.textColor = [198, 40, 40];
+        else if (data.cell.raw === 'Bajo PVP') data.cell.styles.textColor = [245, 124, 0];
+        else if (data.cell.raw === 'En rango') data.cell.styles.textColor = [46, 125, 50];
+      }
+    },
+    margin: { left: M, right: M },
+  });
+
+  // ── Página 4: Ofertas ──
+  doc.addPage();
+  doc.setFillColor(...RED); doc.rect(0, 0, W, 36, 'F');
+  doc.setTextColor(255, 255, 255); doc.setFontSize(15); doc.setFont('helvetica', 'bold');
+  doc.text('Ofertas Vigentes', M, 16);
+  doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+  doc.text(`Grupo Bimbo · ${dateStr}`, M, 27);
+
+  if (!offers.length) {
+    doc.setFontSize(11); doc.setTextColor(...GRAY);
+    doc.text('No hay ofertas activas actualmente.', M, 56);
+  } else {
+    doc.autoTable({
+      startY: 44,
+      head: [['Producto', 'Marca', 'Cadena', 'Precio Lista', 'Precio Oferta', 'Descuento']],
+      body: [...offers].sort((a, b) => (b.listPrice - b.price) / b.listPrice - (a.listPrice - a.price) / a.listPrice).map((i) => [
+        i.name.substring(0, 50), cap(i.brand), SLABELS[i.super] || i.super,
+        fmtN(i.listPrice), fmtN(i.price),
+        `-${((i.listPrice - i.price) / i.listPrice * 100).toFixed(1)}%`,
+      ]),
+      theme: 'striped',
+      styles: { fontSize: 8, cellPadding: 2.5 },
+      headStyles: { fillColor: RED, textColor: 255, fontStyle: 'bold', fontSize: 8 },
+      columnStyles: { 0: { cellWidth: 65 }, 2: { cellWidth: 22 }, 3: { halign: 'right', cellWidth: 24 }, 4: { halign: 'right', cellWidth: 24, textColor: RED }, 5: { halign: 'right', cellWidth: 20, textColor: RED, fontStyle: 'bold' } },
+      margin: { left: M, right: M },
+    });
+  }
+
+  // ── Página 5: Catálogo ──
+  doc.addPage();
+  doc.setFillColor(...RED); doc.rect(0, 0, W, 36, 'F');
+  doc.setTextColor(255, 255, 255); doc.setFontSize(15); doc.setFont('helvetica', 'bold');
+  doc.text('Catálogo Completo', M, 16);
+  doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+  doc.text(`Grupo Bimbo · ${dateStr}`, M, 27);
+
+  doc.autoTable({
+    startY: 44,
+    head: [['Producto', 'Marca', 'Cadena', 'Precio', 'Lista', 'Oferta']],
+    body: [...items].sort((a, b) => a.brand.localeCompare(b.brand) || a.name.localeCompare(b.name)).map((i) => [
+      i.name.substring(0, 55), cap(i.brand), SLABELS[i.super] || i.super,
+      fmtN(i.price), i.listPrice ? fmtN(i.listPrice) : '—',
+      i.listPrice && i.price < i.listPrice ? 'Sí' : '',
+    ]),
+    theme: 'striped',
+    styles: { fontSize: 7.5, cellPadding: 2 },
+    headStyles: { fillColor: RED, textColor: 255, fontStyle: 'bold', fontSize: 8 },
+    columnStyles: { 0: { cellWidth: 70 }, 2: { cellWidth: 22 }, 3: { halign: 'right', cellWidth: 20 }, 4: { halign: 'right', cellWidth: 22 }, 5: { halign: 'center', cellWidth: 14 } },
+    margin: { left: M, right: M },
+  });
+
+  // Números de página
+  const total = doc.internal.getNumberOfPages();
+  for (let p = 1; p <= total; p++) {
+    doc.setPage(p);
+    doc.setFontSize(8); doc.setTextColor(...GRAY);
+    doc.text(`Pág. ${p} / ${total}`, W - M, H - 8, { align: 'right' });
+    doc.text('Informe generado automáticamente · Grupo Bimbo Uruguay', M, H - 8);
+  }
+
+  return new Blob([doc.output('arraybuffer')], { type: 'application/pdf' });
 }
 
 loadLocalPriceList();

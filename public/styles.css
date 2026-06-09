@@ -633,3 +633,93 @@ td a:hover { color: var(--rojo); text-decoration: underline; }
   .tab span { display: none; }
   .tabs { overflow-x: auto; }
 }
+
+/* ===== Tab Enviar Informe ===== */
+.send-info-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.send-kpi {
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.send-kpi-label {
+  font-size: 11px;
+  color: var(--texto-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-weight: 600;
+}
+
+.send-kpi-value {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--rojo);
+  line-height: 1.1;
+  margin-top: 4px;
+}
+
+.send-kpi-sub {
+  font-size: 11px;
+  color: var(--texto-muted);
+  margin-top: 2px;
+}
+
+.send-divider {
+  border: none;
+  border-top: 1px solid var(--borde);
+  margin: 18px 0;
+}
+
+.send-section-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--texto-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.send-email-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.send-email-tag {
+  background: #e3f2fd;
+  color: #1565c0;
+  border-radius: 99px;
+  padding: 4px 14px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.send-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.send-status {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: var(--radio);
+  font-size: 13px;
+}
+
+.send-status-ok  { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+.send-status-err { background: #fce4e4; color: #c62828; border: 1px solid #ffcdd2; }
+.send-status-info { background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; }
