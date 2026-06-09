@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Informe de Precios - Grupo Bimbo Uruguay</title>
+<link rel="icon" href="/logo.jpg" />
+<link rel="stylesheet" href="/report.css" />
+</head>
+<body>
+
+<header class="rpt-header">
+  <img src="/logo.jpg" alt="Bimbo" />
+  <div>
+    <h1>Informe de Precios</h1>
+    <p id="headerDate">Grupo Bimbo · Supermercados Uruguay</p>
+  </div>
+  <a href="/" class="header-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    Volver al dashboard
+  </a>
+</header>
+
+<div id="loadingState" class="loading">
+  <div class="spinner"></div>
+  <p>Cargando datos del informe...</p>
+</div>
+
+<div id="mainContent" style="display:none">
+  <div class="rpt-layout">
+
+    <!-- Left: Report content -->
+    <div class="rpt-main">
+
+      <!-- KPIs -->
+      <div class="kpi-grid" id="kpiGrid"></div>
+
+      <!-- Coverage matrix -->
+      <div class="panel">
+        <h2>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          Cobertura por Marca y Cadena
+        </h2>
+        <div style="overflow-x:auto">
+          <table class="cov-matrix" id="covMatrix"></table>
+        </div>
+      </div>
+
+      <!-- Coverage chart -->
+      <div class="panel">
+        <h2>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          SKUs por Marca y Cadena
+        </h2>
+        <div class="chart-wrap">
+          <canvas id="chartCoverage"></canvas>
+        </div>
+      </div>
+
+      <!-- PVP gap chart -->
+      <div class="panel">
+        <h2>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+          Distribución vs PVP Sugerido
+        </h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center">
+          <div class="chart-wrap" style="height:200px">
+            <canvas id="chartGap"></canvas>
+          </div>
+          <div id="gapLegend"></div>
+        </div>
+      </div>
+
+      <!-- Price comparison table -->
+      <div class="panel">
+        <h2>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"></path><path d="M4 5h16"></path><path d="M4 12h12"></path><path d="M4 19h8"></path></svg>
+          Precios vs PVP Sugerido
+        </h2>
+        <div style="overflow-x:auto">
+          <table class="rpt-table" id="priceTable">
+            <thead><tr>
+              <th>Producto</th>
+              <th>Marca</th>
+              <th>Cadena</th>
+              <th class="num">Precio</th>
+              <th class="num">PVP Sug.</th>
+              <th class="num">GAP</th>
+              <th>Estado</th>
+            </tr></thead>
+            <tbody id="priceRows"></tbody>
+          </table>
+        </div>
+        <p id="priceTableNote" style="font-size:11px;color:var(--text-muted);margin-top:10px"></p>
+      </div>
+
+      <!-- Offers table -->
+      <div class="panel">
+        <h2>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+          Ofertas Vigentes
+        </h2>
+        <div style="overflow-x:auto">
+          <table class="rpt-table" id="offersTable">
+            <thead><tr>
+              <th>Producto</th>
+              <th>Marca</th>
+              <th>Cadena</th>
+              <th class="num">Lista</th>
+              <th class="num">Oferta</th>
+              <th class="num">Descuento</th>
+            </tr></thead>
+            <tbody id="offersRows"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="offersEmpty" style="display:none;color:var(--text-muted);font-size:13px;padding:20px 0;text-align:center">No hay ofertas activas actualmente.</div>
+      </div>
+
+      <!-- Full catalog -->
+      <div class="panel">
+        <h2>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+          Catálogo Completo
+        </h2>
+        <div style="overflow-x:auto">
+          <table class="rpt-table" id="catalogTable">
+            <thead><tr>
+              <th>Producto</th>
+              <th>Marca</th>
+              <th>Cadena</th>
+              <th class="num">Precio</th>
+              <th class="num">Lista</th>
+              <th>Oferta</th>
+            </tr></thead>
+            <tbody id="catalogRows"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right: Actions sidebar -->
+    <div class="rpt-sidebar">
+
+      <div class="action-panel">
+        <h3>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+          Generar Informe PDF
+        </h3>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.5">
+          El PDF incluye tablas de precios, análisis de ofertas, cobertura por marca y gráficos.
+        </p>
+        <button class="btn primary" id="btnGenerate">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+          Previsualizar y Generar PDF
+        </button>
+      </div>
+
+      <div class="action-panel" id="emailPanel" style="display:none">
+        <h3>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          Enviar por Email
+        </h3>
+        <p class="form-hint">Ingresá los correos de Outlook (Enter para agregar cada uno)</p>
+        <div class="email-tags" id="emailTags" onclick="document.getElementById('emailInput').focus()">
+          <input type="email" id="emailInput" class="email-input-inner" placeholder="correo@empresa.com" />
+        </div>
+        <p class="form-hint">Presioná Enter o coma para agregar cada dirección.</p>
+        <button class="btn success" id="btnSendEmail" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          Enviar a destinatarios
+        </button>
+        <button class="btn" id="btnDownloadOnly">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Descargar PDF
+        </button>
+        <div class="status-msg" id="statusMsg"></div>
+      </div>
+
+      <!-- Data info -->
+      <div class="action-panel">
+        <h3>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          Datos del informe
+        </h3>
+        <div id="dataInfo" style="font-size:12px;color:var(--text-muted);line-height:1.8"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- PDF Preview Modal -->
+<div class="modal-overlay" id="pdfModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Previsualización del Informe PDF</h3>
+      <button class="modal-close" id="modalClose">×</button>
+    </div>
+    <div class="modal-iframe-wrap">
+      <iframe id="pdfPreview" title="PDF Preview"></iframe>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" id="modalDownload">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        Descargar PDF
+      </button>
+      <button class="btn primary" id="modalConfirm">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        Confirmar y usar para envío
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- CDN Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="/report.js"></script>
+</body>
+</html>
